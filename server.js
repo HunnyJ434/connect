@@ -13,10 +13,11 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",  // Optionally replace * with your client URL for more security
+      origin: "https://connect-ashen-three.vercel.app",  // Your Vercel domain
       methods: ["GET", "POST"]
     }
   });
+  
 
   let users = [];
   let messages = [];
