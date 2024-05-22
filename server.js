@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: "*",  // Optionally replace * with your client URL for more security
       methods: ["GET", "POST"]
     }
   });
@@ -64,6 +64,6 @@ app.prepare().then(() => {
   });
 
   httpServer.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on port ${port}`);
   });
 });

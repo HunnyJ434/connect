@@ -20,10 +20,12 @@ const Home = () => {
   const [recipientId, setRecipientId] = useState<number | null>(null);
   const [showMessageWindow, setShowMessageWindow] = useState(false);
 
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000';
+
   useEffect(() => {
     if (!socket) {
       console.log('Setting up WebSocket in Home component');
-      socket = socket = io('https://connect-ashen-three.vercel.app', {
+      socket = io(socketUrl, {
         path: '/socket.io',
         transports: ['websocket'],
       });
@@ -127,10 +129,7 @@ const Home = () => {
           <button onClick={sendMessage} className="px-4 py-2 bg-blue-500 text-white rounded">
             Send Message
           </button>
-
-        </div>
-      )}
-      {currentUser &&( <ul className="mt-5">
+          <ul className="mt-5">
             {messages
               .filter(msg => msg.from === currentUser.id || msg.to === currentUser.id)
               .map(msg => (
@@ -138,7 +137,9 @@ const Home = () => {
                   {msg.from === currentUser.id ? 'You' : `User ${msg.from}`} to {msg.to === currentUser.id ? 'You' : `User ${msg.to}`}: {msg.text}
                 </li>
               ))}
-      </ul>)}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
