@@ -23,7 +23,7 @@ const Home = () => {
   useEffect(() => {
     if (!socket) {
       console.log('Setting up WebSocket in Home component');
-      socket = socket = io('https://connect-hxw3h0ni0-hunnyj434s-projects.vercel.app', {
+      socket = socket = io('https://connect-ashen-three.vercel.app', {
         path: '/socket.io',
         transports: ['websocket'],
       });
