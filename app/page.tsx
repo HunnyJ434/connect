@@ -21,7 +21,6 @@ const Home = () => {
 
   useEffect(() => {
     if (!socket) {
-      console.log('Setting up WebSocket in Home component');
       socket = io('http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
@@ -44,9 +43,7 @@ const Home = () => {
 
       socket.on('userList', (data: User[]) => {
         console.log('Received user list:', data);
-        setTimeout(() => {
-          setUsers(data);
-        }, 1000); // Adding a delay of 1 second
+        setUsers(data);
       });
 
       socket.on('disconnect', () => {
@@ -64,7 +61,6 @@ const Home = () => {
 
     return () => {
       if (socket) {
-        console.log('Cleaning up WebSocket connection in Home component');
         socket.off('welcome');
         socket.off('loadMessages');
         socket.off('newDirectMessage');

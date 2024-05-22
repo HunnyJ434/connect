@@ -13,7 +13,6 @@ const useUsers = () => {
 
   useEffect(() => {
     if (!socket) {
-      console.log('Initializing WebSocket connection');
       socket = io('http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
@@ -26,9 +25,7 @@ const useUsers = () => {
 
       socket.on('userList', (data: User[]) => {
         console.log('Received user list:', data);
-        setTimeout(() => {
-          setUsers(data);
-        }, 1000); // Adding a delay of 1 second
+        setUsers(data);
       });
 
       socket.on('disconnect', () => {
@@ -46,7 +43,6 @@ const useUsers = () => {
 
     return () => {
       if (socket) {
-        console.log('Cleaning up WebSocket connection');
         socket.off('welcome');
         socket.off('userList');
         socket.disconnect();
