@@ -18,9 +18,11 @@ const Home = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
   const [recipientId, setRecipientId] = useState<number | null>(null);
+  const [showMessageWindow, setShowMessageWindow] = useState(false);
 
   useEffect(() => {
     if (!socket) {
+      console.log('Setting up WebSocket in Home component');
       socket = io('http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
@@ -39,6 +41,10 @@ const Home = () => {
       socket.on('newDirectMessage', (message: Message) => {
         setMessages(prevMessages => [...prevMessages, message]);
         console.log('New direct message received:', message);
+        if (message.to === currentUser?.id) {
+          setRecipientId(message.from);
+          setShowMessageWindow(true);
+        }
       });
 
       socket.on('userList', (data: User[]) => {
@@ -61,6 +67,7 @@ const Home = () => {
 
     return () => {
       if (socket) {
+        console.log('Cleaning up WebSocket connection in Home component');
         socket.off('welcome');
         socket.off('loadMessages');
         socket.off('newDirectMessage');
@@ -70,6 +77,7 @@ const Home = () => {
         console.log('WebSocket connection closed (component unmount)');
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setCurrentUser, setUsers]);
 
   const sendMessage = () => {
@@ -88,12 +96,15 @@ const Home = () => {
     <div className="p-5">
       <h1 className="text-xl font-bold mb-3">User IDs</h1>
       <ul className="list-disc pl-5">
-        {users.map(user => (
+        {users.filter((_, index) => index % 2 !== 0).map(user => (
           <li key={user.id} className="mb-1">
             User ID: {user.id} {user.id === currentUser?.id && '(You)'}
             {user.id !== currentUser?.id && (
               <button
-                onClick={() => setRecipientId(user.id)}
+                onClick={() => {
+                  setRecipientId(user.id);
+                  setShowMessageWindow(true);
+                }}
                 className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
               >
                 Message
@@ -103,7 +114,7 @@ const Home = () => {
         ))}
       </ul>
 
-      {currentUser && recipientId && (
+      {currentUser && recipientId && showMessageWindow && (
         <div className="mt-5">
           <h2 className="text-lg font-bold mb-3">Send a Message to User {recipientId}</h2>
           <textarea
@@ -116,7 +127,10 @@ const Home = () => {
           <button onClick={sendMessage} className="px-4 py-2 bg-blue-500 text-white rounded">
             Send Message
           </button>
-          <ul className="mt-5">
+
+        </div>
+      )}
+      {currentUser &&( <ul className="mt-5">
             {messages
               .filter(msg => msg.from === currentUser.id || msg.to === currentUser.id)
               .map(msg => (
@@ -124,9 +138,7 @@ const Home = () => {
                   {msg.from === currentUser.id ? 'You' : `User ${msg.from}`} to {msg.to === currentUser.id ? 'You' : `User ${msg.to}`}: {msg.text}
                 </li>
               ))}
-          </ul>
-        </div>
-      )}
+      </ul>)}
     </div>
   );
 };

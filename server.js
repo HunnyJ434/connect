@@ -13,33 +13,32 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: "*", // Adjust according to your security needs
+      origin: "*",
       methods: ["GET", "POST"]
     }
   });
 
-  let users = [];  // This will store user IDs with their socket IDs
-  let messages = []; // This will store messages
+  let users = [];
+  let messages = [];
 
   io.on('connection', (socket) => {
-    // Assign a random ID when a user connects
     const userId = Math.floor(Math.random() * 10000);
     users.push({ id: userId, socketId: socket.id });
 
-    // Emit the welcome message and current messages to the new user
+    console.log(`User connected: ${userId}, socket id: ${socket.id}`);
+    console.log('Current users:', users);
+
     socket.emit('welcome', { id: userId });
     socket.emit('loadMessages', messages);
-
-    // Emit the updated user list to all clients
     io.emit('userList', users.map(user => ({ id: user.id })));
 
     socket.on('disconnect', () => {
-      users = users.filter(user => user.socketId !== socket.id); // Remove user on disconnect
-      io.emit('userList', users.map(user => ({ id: user.id }))); // Update all clients
-      console.log(`User with ID ${userId} disconnected`);
+      users = users.filter(user => user.socketId !== socket.id);
+      io.emit('userList', users.map(user => ({ id: user.id })));
+      console.log(`User with ID ${userId} disconnected, socket id: ${socket.id}`);
+      console.log('Current users:', users);
     });
 
-    // Handle direct messages
     socket.on('directMessage', ({ text, from, to }) => {
       const message = {
         id: messages.length + 1,
@@ -50,14 +49,13 @@ app.prepare().then(() => {
       };
       messages.push(message);
 
-      // Find the recipient's socket
       const recipient = users.find(user => user.id === to);
       if (recipient) {
         io.to(recipient.socketId).emit('newDirectMessage', message);
       }
 
-      // Also notify the sender (for confirmation or UI updates)
       socket.emit('newDirectMessage', message);
+      console.log(`Message from ${from} to ${to}: ${text}`);
     });
   });
 

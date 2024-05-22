@@ -13,6 +13,7 @@ const useUsers = () => {
 
   useEffect(() => {
     if (!socket) {
+      console.log('Initializing WebSocket connection');
       socket = io('http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
@@ -43,6 +44,7 @@ const useUsers = () => {
 
     return () => {
       if (socket) {
+        console.log('Cleaning up WebSocket connection');
         socket.off('welcome');
         socket.off('userList');
         socket.disconnect();
