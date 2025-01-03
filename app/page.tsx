@@ -27,7 +27,7 @@ const Home = () => {
 
       <div>
         <h2 className="text-2xl font-semibold mb-3">Get Started:</h2>
-        <p className="mb-4">Choose how you'd like to communicate:</p>
+        <p className="mb-4">Choose how you would like to communicate:</p>
 
         <div className="space-x-4">
           <Link href="/anonychat">
@@ -47,7 +47,7 @@ const Home = () => {
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">About Us:</h2>
         <p className="mb-4">
-          We built this platform to make it easy for people to connect with others. Whether you're here to make new friends, have casual conversations, or just pass the time, we've got you covered.
+          We built this platform to make it easy for people to connect with others. Whether you are here to make new friends, have casual conversations, or just pass the time, we have got you covered.
         </p>
         <p>Start chatting now and enjoy the experience!</p>
       </div>

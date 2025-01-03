@@ -11,7 +11,7 @@ interface Message {
   timestamp: Date;
 }
 
-const anonychat = () => {
+const Anonychat = () => {
   const { users, setUsers, currentUser, setCurrentUser, socket } = useUsers();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
@@ -119,4 +119,4 @@ const anonychat = () => {
   );
 };
 
-export default anonychat;
+export default Anonychat;
