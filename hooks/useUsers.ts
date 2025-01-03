@@ -14,7 +14,7 @@ const useUsers = () => {
   useEffect(() => {
     if (!socket) {
       console.log('Initializing WebSocket connection');
-      socket = io('http://localhost:3000', {
+      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
       });
@@ -54,7 +54,7 @@ const useUsers = () => {
     };
   }, []);
 
-  return { users, setUsers, currentUser, setCurrentUser };
+  return { users, setUsers, currentUser, setCurrentUser, socket };
 };
 
 export default useUsers;

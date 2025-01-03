@@ -13,49 +13,39 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: "https://connect-ashen-three.vercel.app",  // Your Vercel domain
+      origin: process.env.FRONTEND_URL || 'http://localhost:3000',  // Adjust to your frontend URL
       methods: ["GET", "POST"]
     }
   });
-  
 
   let users = [];
   let messages = [];
 
   io.on('connection', (socket) => {
-    const userId = Math.floor(Math.random() * 10000);
-    users.push({ id: userId, socketId: socket.id });
+    const { userId } = socket.handshake.query;  // Get the anonymous user ID from the query
+    console.log(`Anonymous user connected with userId: ${userId}, socket id: ${socket.id}`);
 
-    console.log(`User connected: ${userId}, socket id: ${socket.id}`);
-    console.log('Current users:', users);
+    users.push({ userId, socketId: socket.id });
 
     socket.emit('welcome', { id: userId });
     socket.emit('loadMessages', messages);
-    io.emit('userList', users.map(user => ({ id: user.id })));
+    io.emit('userList', users);
 
     socket.on('disconnect', () => {
       users = users.filter(user => user.socketId !== socket.id);
-      io.emit('userList', users.map(user => ({ id: user.id })));
-      console.log(`User with ID ${userId} disconnected, socket id: ${socket.id}`);
-      console.log('Current users:', users);
+      io.emit('userList', users);
+      console.log(`Anonymous user with userId: ${userId} disconnected`);
     });
 
     socket.on('directMessage', ({ text, from, to }) => {
-      const message = {
-        id: messages.length + 1,
-        text,
-        from,
-        to,
-        timestamp: new Date(),
-      };
+      const message = { text, from, to, timestamp: new Date() };
       messages.push(message);
 
-      const recipient = users.find(user => user.id === to);
+      const recipient = users.find(user => user.userId === to);  // Find recipient by userId
       if (recipient) {
-        io.to(recipient.socketId).emit('newDirectMessage', message);
+        io.to(recipient.socketId).emit('newDirectMessage', message);  // Send message to recipient
       }
 
-      socket.emit('newDirectMessage', message);
       console.log(`Message from ${from} to ${to}: ${text}`);
     });
   });

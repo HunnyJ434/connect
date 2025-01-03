@@ -1,6 +1,9 @@
+// lib/dbConnect.js
 import { MongoClient } from 'mongodb';
 
-const client = new MongoClient(process.env.MONGODB_URI!);
+const uri = "mongodb+srv://Hunnyj:LcUvjchCZByDCFUy@cluster0.8ehw0.mongodb.net/yourDatabaseName?retryWrites=true&w=majority&appName=Cluster0";
+
+const client = new MongoClient(uri);
 let isConnected = false; // This will keep track of the connection status
 
 export async function dbConnect() {
@@ -12,4 +15,13 @@ export async function dbConnect() {
   return client.db('yourDatabaseName'); // Adjust 'yourDatabaseName' accordingly
 }
 
-export default dbConnect;
+// New function to check database connection
+export async function checkDbConnection() {
+  try {
+    const db = await dbConnect();
+    return db !== null;
+  } catch (error) {
+    console.error("DB Connection Error:", error);
+    return false;
+  }
+}

@@ -1,24 +1,37 @@
 'use client'
-import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link'; // Import Link for navigation
+import { useRouter } from 'next/navigation'; // Import useRouter for programmatic navigation
 
 export default function SignIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    
+    const { data: session, status } = useSession(); // Get the session info
+    const router = useRouter(); // Initialize useRouter for navigation
+
+    // Redirect to dashboard if user is already logged in
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push('/dashboard'); // Redirect to dashboard
+        }
+    }, [status, router]);
 
     async function handleSubmit(e: { preventDefault: () => void; }) {
         e.preventDefault();
-        const response = await fetch('/api/auth/signin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        const data = await response.json();
 
-        setMessage(data.message);
-        if (response.ok) {
-            // Redirect to dashboard or home page
-            window.location.href = '/dashboard'; // Adjust the redirection as needed
+        const result = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+        });
+
+        if (result?.error) {
+            setMessage(result.error);
+        } else {
+            router.push('/dashboard');  // Redirect to dashboard after successful login
         }
     }
 
@@ -47,6 +60,16 @@ export default function SignIn() {
                     <p className="text-center text-red-500 mt-4">{message}</p>
                 )}
             </form>
+
+            {/* Sign-up link */}
+            <div className="text-center">
+                <p className="text-sm text-gray-600">
+                    Don't have an account yet?{' '}
+                    <Link href="/signup" className="text-blue-500 hover:text-blue-700">
+                        Register
+                    </Link>
+                </p>
+            </div>
         </div>
     );
 }

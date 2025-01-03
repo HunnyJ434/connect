@@ -1,11 +1,11 @@
 // pages/api/auth/signup.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { hashPassword } from '../../../lib/auth';
-import dbConnect from '../../../lib/dbConnect';  // Import your dbConnect utility
+import {dbConnect} from '../../../lib/dbConnect';  // Import your dbConnect utility
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { email, password } = req.body;
+        const { email, password , username} = req.body;
         const hashedPassword = await hashPassword(password);
 
         try {
@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // Insert the new user
             const result = await collection.insertOne({
                 email,
+                username,
                 password: hashedPassword
             });
 
