@@ -14,7 +14,7 @@ const useUsers = () => {
   useEffect(() => {
     if (!socket) {
       console.log('Initializing WebSocket connection');
-      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000', {
+      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'https://secure-springs-34120-c35181257eb9.herokuapp.com/', {
         path: '/socket.io',
         transports: ['websocket'],
       });

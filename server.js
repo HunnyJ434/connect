@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',  // Adjust to your frontend URL
+      origin: process.env.FRONTEND_URL || 'https://secure-springs-34120-c35181257eb9.herokuapp.com/',  // Adjust to your frontend URL
       methods: ["GET", "POST"]
     }
   });
