@@ -10,8 +10,9 @@ export default function Navbar() {
         <nav className="bg-gray-800 text-white shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    {/* Brand Logo */}
-                    <div className="flex-shrink-0">
+                    {/* Brand Logo with Icon */}
+                    <div className="flex-shrink-0 flex items-center xl:ml-[-50px]"> {/* Reduced space-x from 2 to 1 */}
+                        <img src="/icons8-no-chat-100.png" alt="Icon" className="w-12 h-12" />
                         <Link href="/" className="text-xl font-bold text-white hover:text-gray-300">
                             Connect
                         </Link>
