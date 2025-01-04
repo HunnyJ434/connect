@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
 import io, { Socket } from 'socket.io-client';
-
-export interface User {
-  id: number;
-}
-
+import { useState,useEffect, Key } from 'react';
 let socket: Socket | null = null;
+export interface User {
+  userId: string;
+  id: string; // Matches `userId` from the server
+  socketId: string;
+}
 
 const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,9 +14,12 @@ const useUsers = () => {
   useEffect(() => {
     if (!socket) {
       console.log('Initializing WebSocket connection');
-      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'https://secure-springs-34120-c35181257eb9.herokuapp.com/', {
+
+      const userId = generateUserId(); // Generate or retrieve a unique userId
+      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3000', {
         path: '/socket.io',
         transports: ['websocket'],
+        query: { userId }, // Pass userId here
       });
 
       socket.on('welcome', (data: User) => {
@@ -36,23 +39,20 @@ const useUsers = () => {
       socket.on('connect_error', (error) => {
         console.error('WebSocket connect error:', error);
       });
-
-      socket.on('error', (error) => {
-        console.error('Socket.IO error:', error);
-      });
     }
 
     return () => {
       if (socket) {
-        console.log('Cleaning up WebSocket connection');
-        socket.off('welcome');
-        socket.off('userList');
         socket.disconnect();
         socket = null;
-        console.log('WebSocket connection closed (component unmount)');
       }
     };
   }, []);
+
+  const generateUserId = () => {
+    // Generate a unique userId (e.g., random number or UUID)
+    return Math.floor(Math.random() * 100000).toString();
+  };
 
   return { users, setUsers, currentUser, setCurrentUser, socket };
 };

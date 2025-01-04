@@ -13,37 +13,45 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'https://secure-springs-34120-c35181257eb9.herokuapp.com/',  // Adjust to your frontend URL
-      methods: ["GET", "POST"]
-    }
+      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+    },
   });
 
   let users = [];
   let messages = [];
 
   io.on('connection', (socket) => {
-    const { userId } = socket.handshake.query;  // Get the anonymous user ID from the query
-    console.log(`Anonymous user connected with userId: ${userId}, socket id: ${socket.id}`);
+    const { userId } = socket.handshake.query;
 
+    console.log(`User connected: userId=${userId}, socketId=${socket.id}`);
+
+    // Add the user to the list
     users.push({ userId, socketId: socket.id });
 
+    // Send initial data
     socket.emit('welcome', { id: userId });
     socket.emit('loadMessages', messages);
-    io.emit('userList', users);
 
+    // Broadcast updated user list
+    io.emit('userList', users.map((user) => ({ userId: user.userId, socketId: user.socketId })));
+
+    // Handle disconnection
     socket.on('disconnect', () => {
-      users = users.filter(user => user.socketId !== socket.id);
-      io.emit('userList', users);
-      console.log(`Anonymous user with userId: ${userId} disconnected`);
+      users = users.filter((user) => user.socketId !== socket.id);
+      io.emit('userList', users.map((user) => ({ userId: user.userId, socketId: user.socketId })));
+      console.log(`User disconnected: userId=${userId}`);
     });
 
+    // Handle direct messages
     socket.on('directMessage', ({ text, from, to }) => {
       const message = { text, from, to, timestamp: new Date() };
       messages.push(message);
 
-      const recipient = users.find(user => user.userId === to);  // Find recipient by userId
+      // Send message to recipient
+      const recipient = users.find((user) => user.userId === to);
       if (recipient) {
-        io.to(recipient.socketId).emit('newDirectMessage', message);  // Send message to recipient
+        io.to(recipient.socketId).emit('newDirectMessage', message);
       }
 
       console.log(`Message from ${from} to ${to}: ${text}`);
