@@ -68,7 +68,7 @@ const authOptions = {
   secret: "60611c280e79ae8b7aa2ee878b4a09ed816238c9774a5934ca9d750faea82e5b", // Replace with a secure, random string
   pages: {
     signIn: "/signin", // Redirect to your custom sign-in page
-    signOut: "/signout", // Redirect to your custom sign-out page
+    signOut: "/signup", // Redirect to your custom sign-out page
   },
 };
 
