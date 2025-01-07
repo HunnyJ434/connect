@@ -11,7 +11,6 @@ export default function Dashboard() {
     const [newMessage, setNewMessage] = useState('');
     const [loadingMessages, setLoadingMessages] = useState(false);
 
-    // Fetch users (excluding the logged-in user)
     useEffect(() => {
         if (session) {
             fetch('/api/users')
@@ -74,6 +73,12 @@ export default function Dashboard() {
         }
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    };
+
     if (!session) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -107,7 +112,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Chat Section */}
-                <div className="w-2/3 bg-white p-4 rounded-lg shadow ml-4 flex flex-col">
+                <div className="w-2/3 bg-white text-black font-black font-normal p-4 rounded-lg shadow ml-4 flex flex-col">
                     {selectedUser ? (
                         <>
                             <h2 className="text-lg font-bold text-gray-700 mb-4">
@@ -138,6 +143,7 @@ export default function Dashboard() {
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
+                                    onKeyDown={handleKeyDown} // Add event listener here
                                     placeholder="Type a message..."
                                     className="flex-1 border rounded-lg p-2 mr-2"
                                 />
