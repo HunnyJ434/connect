@@ -41,7 +41,7 @@ export default function Navbar() {
                                     Dashboard
                                 </Link>
                                 <button
-                                    onClick={() => signOut()}
+                                    onClick={() => signOut({ callbackUrl: 'http://34.133.212.1:3000/' })}
                                     className="hover:text-gray-300"
                                 >
                                     Sign Out
