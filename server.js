@@ -55,7 +55,12 @@ app.prepare().then(() => {
       broadcastUserList();
       console.log(`User disconnected: userId=${userId}`);
     });
-
+    socket = io('http://34.133.212.1:3000', {
+      path: '/socket.io',
+      transports: ['websocket'],
+      query: { userId }, // Pass userId here
+    });
+    
     // Handle direct messages
     socket.on('directMessage', ({ text, from, to }) => {
       if (!text || !from || !to) {
