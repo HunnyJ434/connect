@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: process.env.FRONTEND_URL || 'https://connect-ashen-three.vercel.app/anonychat',
       methods: ['GET', 'POST'],
     },
   });
@@ -21,47 +21,73 @@ app.prepare().then(() => {
   let users = [];
   let messages = [];
 
+  // Helper functions
+  const broadcastUserList = () => {
+    io.emit('userList', users.map((user) => ({ userId: user.userId, socketId: user.socketId })));
+  };
+
+  const findUserById = (userId) => users.find((user) => user.userId === userId);
+
   io.on('connection', (socket) => {
     const { userId } = socket.handshake.query;
+
+    if (!userId) {
+      console.error('Connection attempted without userId');
+      socket.disconnect(true);
+      return;
+    }
 
     console.log(`User connected: userId=${userId}, socketId=${socket.id}`);
 
     // Add the user to the list
     users.push({ userId, socketId: socket.id });
 
-    // Send initial data
+    // Send initial data to the connected user
     socket.emit('welcome', { id: userId });
     socket.emit('loadMessages', messages);
 
-    // Broadcast updated user list
-    io.emit('userList', users.map((user) => ({ userId: user.userId, socketId: user.socketId })));
+    // Broadcast the updated user list to all clients
+    broadcastUserList();
 
-    // Handle disconnection
+    // Handle user disconnection
     socket.on('disconnect', () => {
       users = users.filter((user) => user.socketId !== socket.id);
-      io.emit('userList', users.map((user) => ({ userId: user.userId, socketId: user.socketId })));
+      broadcastUserList();
       console.log(`User disconnected: userId=${userId}`);
     });
 
     // Handle direct messages
     socket.on('directMessage', ({ text, from, to }) => {
-      const message = { text, from, to, timestamp: new Date() };
-      messages.push(message);
-
-      // Send message to recipient
-      const recipient = users.find((user) => user.userId === to);
-      if (recipient) {
-        io.to(recipient.socketId).emit('newDirectMessage', message);
+      if (!text || !from || !to) {
+        console.error('Invalid message data received');
+        return;
       }
 
-      console.log(`Message from ${from} to ${to}: ${text}`);
+      const message = {
+        text,
+        from,
+        to,
+        timestamp: new Date(),
+      };
+      messages.push(message);
+
+      const recipient = findUserById(to);
+
+      if (recipient) {
+        io.to(recipient.socketId).emit('newDirectMessage', message);
+        console.log(`Message from ${from} to ${to}: ${text}`);
+      } else {
+        console.warn(`Message to ${to} failed: User not connected`);
+      }
     });
   });
 
+  // Handle all other HTTP requests
   server.all('*', (req, res) => {
     return handle(req, res);
   });
 
+  // Start the server
   httpServer.listen(port, () => {
     console.log(`> Ready on port ${port}`);
   });
