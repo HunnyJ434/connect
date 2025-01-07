@@ -36,11 +36,14 @@ export default async function handler(req, res) {
             const db = await dbConnect();
             const messagesCollection = db.collection('messages');
 
-            const filter = {};
-            if (sender) filter.sender = sender;
-            if (recipient) filter.recipient = recipient;
-
-            const messages = await messagesCollection.find(filter).toArray();
+            // Fetch messages where either sender is the logged-in user and recipient is the other user
+            // or vice versa
+            const messages = await messagesCollection.find({
+                $or: [
+                    { sender, recipient },
+                    { sender: recipient, recipient: sender }
+                ]
+            }).toArray();
 
             res.status(200).json({ success: true, data: messages });
         } catch (error) {

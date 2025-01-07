@@ -102,7 +102,7 @@ function MobileMenu({ session }) {
                                 Dashboard
                             </Link>
                             <button
-                                onClick={() => signOut()}
+                                onClick={() => signOut({ callbackUrl: 'http://34.133.212.1:3000/' })}
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                             >
                                 Sign Out
