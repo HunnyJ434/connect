@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'https://connect-ashen-three.vercel.app/anonychat',
+      origin: process.env.FRONTEND_URL || 'https://connect-ashen-three.vercel.app/anonychat', // Change to your frontend URL
       methods: ['GET', 'POST'],
     },
   });
@@ -55,12 +55,7 @@ app.prepare().then(() => {
       broadcastUserList();
       console.log(`User disconnected: userId=${userId}`);
     });
-    socket = io('http://34.133.212.1:3000', {
-      path: '/socket.io',
-      transports: ['websocket'],
-      query: { userId }, // Pass userId here
-    });
-    
+
     // Handle direct messages
     socket.on('directMessage', ({ text, from, to }) => {
       if (!text || !from || !to) {
@@ -93,7 +88,7 @@ app.prepare().then(() => {
   });
 
   // Start the server
-  httpServer.listen(port, () => {
+  httpServer.listen(port, '0.0.0.0', () => {  // Listen on all IPs for external access
     console.log(`> Ready on port ${port}`);
   });
 });
