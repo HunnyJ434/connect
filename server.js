@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(server);
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'https://connect-ashen-three.vercel.app/anonychat', // Change to your frontend URL
+      origin: "*", // Change to your frontend URL
       methods: ['GET', 'POST'],
     },
   });
