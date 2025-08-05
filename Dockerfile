@@ -14,11 +14,11 @@ COPY . .
 # Build the Next.js application
 RUN npm run build
 
-# Set the default port (this is now used by Next.js)
+# Set environment variables
 ENV PORT 8080
 
-# Expose the port the app will run on
+# Expose the port
 EXPOSE 8080
 
-# Start the application on the specified port
-CMD ["npm", "start"]
+# Start the app with your custom server.js
+CMD ["node", "server.js"]
