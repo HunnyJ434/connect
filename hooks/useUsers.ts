@@ -16,7 +16,7 @@ const useUsers = () => {
       console.log('Initializing WebSocket connection');
 
       const userId = generateUserId(); // Generate or retrieve a unique userId
-      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'https://3.144.80.143:3000', {
+      socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'https://18.222.230.141:3000', {
         path: '/socket.io',
         transports: ['websocket'],
         query: { userId }, // Pass userId here
